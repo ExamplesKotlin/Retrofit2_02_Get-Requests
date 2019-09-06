@@ -45,6 +45,8 @@ import com.raywenderlich.android.w00tze.model.User
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Response
 import java.io.IOException
 
 
@@ -54,12 +56,23 @@ object RemoteRepository : Repository {
 
   private const val LOGIN = "w00tze"
 
+  private val api = Injection.provideGitHubApi()
+
   override fun getRepos(): LiveData<List<Repo>> {
     val liveData = MutableLiveData<List<Repo>>()
 
-    FetchAsyncTask("/users/$LOGIN/repos", ::parseRepos, { repos ->
-      liveData.value = repos
-    }).execute()
+    api.getRepos(LOGIN).enqueue(object : retrofit2.Callback<List<Repo>> {
+
+      override fun onResponse(call: Call<List<Repo>>, response: Response<List<Repo>>) {
+        if (response != null) {
+          liveData.value = emptyList()
+        }
+      }
+
+      override fun onFailure(call: Call<List<Repo>>, t: Throwable) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+      }
+    })
 
     return liveData
   }
