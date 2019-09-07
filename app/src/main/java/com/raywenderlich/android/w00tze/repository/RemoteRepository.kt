@@ -46,6 +46,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
 
@@ -61,7 +62,7 @@ object RemoteRepository : Repository {
   override fun getRepos(): LiveData<List<Repo>> {
     val liveData = MutableLiveData<List<Repo>>()
 
-    api.getRepos(LOGIN).enqueue(object : retrofit2.Callback<List<Repo>> {
+    api.getRepos(LOGIN).enqueue(object : Callback<List<Repo>> {
 
       override fun onResponse(call: Call<List<Repo>>, response: Response<List<Repo>>) {
         if (response != null) {
@@ -80,9 +81,18 @@ object RemoteRepository : Repository {
   override fun getGists(): LiveData<List<Gist>> {
     val liveData = MutableLiveData<List<Gist>>()
 
-    FetchAsyncTask("/users/$LOGIN/gists", ::parseGists, { gists ->
-      liveData.value = gists
-    }).execute()
+    api.getGists(LOGIN).enqueue(object : Callback<List<Gist>> {
+
+      override fun onResponse(call: Call<List<Gist>>, response: Response<List<Gist>>) {
+        if (response != null) {
+          liveData.value = emptyList()
+        }
+      }
+
+      override fun onFailure(call: Call<List<Gist>>, t: Throwable) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+      }
+    })
 
     return liveData
   }
@@ -90,9 +100,17 @@ object RemoteRepository : Repository {
   override fun getUser(): LiveData<User> {
     val liveData = MutableLiveData<User>()
 
-    FetchAsyncTask("/users/$LOGIN", ::parseUser, { user ->
-      liveData.value = user
-    }).execute()
+    api.getUser(LOGIN).enqueue(object : Callback<User> {
+
+      override fun onResponse(call: Call<User>, response: Response<User>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+      }
+
+      override fun onFailure(call: Call<User>, t: Throwable) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+      }
+
+    })
 
     return liveData
   }
